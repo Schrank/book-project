@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Book-project by Schrank</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">Book-project</h1>
+        <p class="header"></p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/Schrank/book-project/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/Schrank/book-project/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/Schrank/book-project">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/Schrank">Schrank</a></p>
+
+
+      </header>
+      <section>
+        <h1>The Hitchhikers Guide To Magento</h1>
+
+<h6>von Fabian Blechschmidt</h6>
+
+<h3>Vorwort</h3>
+
+<p><code>Per Anhalter durch die Galaxis</code> von <code>Douglas Adams</code> ist ein tolles Buch und da ich plane, diesen Magento Guide unterwegs zu schreiben, wann immer ich Zeit habe, ist das erstmal der Arbeitstitel.</p>
+
+<h2>Konfiguration</h2>
+
+<p>Wie fängt man so ein Buch am Besten an? Ich dachte einfach wie ein neues Modul, da schreibe ich auch die Konfiguration zuerst.</p>
+
+<h3>Modulkonfiguration (etc/modules/Namespace_ModuleName.xml)</h3>
+
+<p>Die wichtigste Konfigurationsdatei für ein Modul liegt in <code>app/etc/modules</code>, mehr dazu in den Hintergrundinfos. Sie heißt normalerweise <code>Firma_Modulbeschreibung.xml</code>, also z.B. <code>Sap_Importer.xml</code> wenn SAP ein Modul zum Import implementiert.</p>
+
+<p>Magento lädt alle xml-Dateien in <code>app/etc/*</code>, das heißt insbesondere, dass es egal ist, wie die Datei heißt. Zum leichteren Wiederfinden und für die eigene Ordnung, ist aber dringend empfohlen, dem Muster <code>Namespace_ModuleName</code> zu folgen. </p>
+
+<p>In dieser Datei kann man ein Modul aus- uns anstellen, den Codepool und Abhängigkeiten definieren. Wichtig noch zu wissen: Nach dem Laden, werden alle Dateien zu eine großen XML-Struktur verschmolzen.</p>
+
+<p>Diese XML-Dateien hat folgenden Aufbau:</p>
+
+<pre><code>&lt;?xml version="1.0"?&gt;
+&lt;config&gt;
+    &lt;modules&gt;
+        &lt;Namespace_ModuleName&gt;
+            &lt;active&gt;true&lt;/active&gt;
+            &lt;codePool&gt;community&lt;/codePool&gt;
+            &lt;depends&gt;
+                &lt;Mage_Cms /&gt;
+                &lt;Mage_Catalog /&gt;
+            &lt;/depends&gt;
+        &lt;/Namespace_ModuleName&gt;
+    &lt;/modules&gt;
+&lt;/config&gt;
+</code></pre>
+
+<h4>Namespace_ModuleName</h4>
+
+<p>Der Name des Moduls. Meiner Meinung nach, braucht man den Namen dieses XML-Knotens nie wieder. <strong>Wichtig</strong> ist nur, dass der Name des Knotens eindeutig über alle Konfigurationsdateien ist.</p>
+
+<h4>active</h4>
+
+<p>Dieser Knoten bestimmt, ob das Modul aktiv ist oder nicht.</p>
+
+<h5>Tipp</h5>
+
+<p>Wenn man ein Modul deaktivieren möchte, ohne die Konfigurationsdatei anzufassen, muss man diesen Knoten überschreiben, vom <code>true</code> auf <code>false</code>. Das Problem ist, dass Magento keine Ordnung vorgibt für das Laden der Dateien. Glücklicherweise geben die meisten Dateisystem die Dateien nach dem Alphabet geordnet zurück, d.h. eine Datei mit dem Namen <code>ZZZ_DeactivateModules.xml</code> und dem folgenden Inhalt, deaktiviert unser Modul wieder.</p>
+
+<pre><code>&lt;?xml version="1.0"?&gt;
+&lt;config&gt;
+    &lt;modules&gt;
+        &lt;Namespace_ModuleName&gt;
+            &lt;active&gt;false&lt;/active&gt;
+        &lt;/Namespace_ModuleName&gt;
+    &lt;/modules&gt;
+&lt;/config&gt;
+</code></pre>
+
+<h4>codePool</h4>
+
+<p>Es gibt drei verschiedene Codepools:</p>
+
+<ul>
+<li>core</li>
+<li>community</li>
+<li>local</li>
+</ul><p>Die Codepools sind eigentlich selbsterklärend:</p>
+
+<ul>
+<li>In <code>core</code> liegen alle Module und zugehörigen Dateien von Magento. Das ist der Ordner in dem man <strong>NIE NIE NIE</strong> Dateien ändert.</li>
+<li>
+<code>community</code> ist für die Community-Module vorgesehen, also alles was man auf <a href="http://www.magentocommerce.com/magento-connect">magento-connect</a>, im weiten Netz oder auf <a href="https://github.com/">github</a>, z.B. <a href="https://github.com/magento-hackathon/">im Magento-Hackathon Repo</a>, findet.</li>
+<li>Und zuletzt: <code>local</code>. Dieser codePool ist für die Module vorgesehen, die nicht veröffentlich werden solle, also exklusiv für Shopbetreiber oder Kunden entwickelt werden.</li>
+</ul><p>Für die <code>local</code>-Module gilt: Man kann sie alle auf einmal deaktivieren, indem man in der local.xml den XML-Knoten <code>global/disable_local_modules/</code> auf <code>true</code> setzt.</p>
+
+<p>Der codePool bestimmt widererwarten NICHT, wo die PHP-Dateien gesucht werden. Das übernimmt der Autoloader, der automatisch <code>local</code>, <code>community</code> und <code>core</code> durchsucht. Es werden aber alle modulabhängigen Konfigurationsdateien dort gesucht (adminhtml.xml, system.xml, api.xml, etc.), mehr dazu später.</p>
+
+<p><strong>Tipp</strong>: Es heißt codePool und nicht codepool!</p>
+
+<h4>depends</h4>
+
+<p>Abhängigkeiten werden hart geprüft. Ist ein Modul, für das eine Abhängigkeit definiert wurde nicht vorhanden, fliegt eine Exception und der Shop ist nicjt mehr zu gebrauchen.
+Die Abhängigkeiten definiereen außerdem die Reihenfolge, in der die Modulkonfigurationsdateien »begriff findem!!«««« eingelesen werden. Das ist später wichtig um Einstellungen in Modulen zu ändern, ohne das Modul selbst anfassen zu müssen.</p>
+
+<h4>Zusammenfassung</h4>
+
+<h6>Hintergrundinfos</h6>
+
+<p>Das Laden aller Konfigurationsdateien findet man in <code>Mage_Core_Model_Config::_getDeclaredModuleFiles</code></p>
+
+<h3>Model, Block, Helper und Rewrites</h3>
+
+<h3>Controller</h3>
+
+<h3>Layout</h3>
+
+<h3>Übersetzungen</h3>
+
+<h3>Observer</h3>
+
+<h2>Model, Resourcemodel und Collections</h2>
+
+<h2>Controller</h2>
+
+<h2>Blöcke und Layout</h2>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
