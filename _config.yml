@@ -1,0 +1,10 @@
+auto: true
+server: true
+permalink: none
+baseurl: http://blog.fabian-blechschmidt.de/book-project
+name: Book Project
+description:
+url: http://blog.fabian-blechschmidt.de
+exclude:
+- .gitignore
+- README.md
