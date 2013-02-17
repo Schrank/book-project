@@ -7,6 +7,7 @@
 
 ## Konfiguration
 Wie fängt man so ein Buch am Besten an? Ich dachte einfach wie ein neues Modul, da schreibe ich auch die Konfiguration zuerst.
+
 ### Modulkonfiguration (etc/modules/Namespace_ModuleName.xml)
 Die wichtigste Konfigurationsdatei für ein Modul liegt in `app/etc/modules`, mehr dazu in den Hintergrundinfos. Sie heißt normalerweise `Firma_Modulbeschreibung.xml`, also z.B. `Sap_Importer.xml` wenn SAP ein Modul zum Import implementiert.
 
@@ -39,9 +40,9 @@ Dieser Knoten bestimmt, ob das Modul aktiv ist oder nicht.
 ##### Tipp
 Wenn man ein Modul deaktivieren möchte, ohne die Konfigurationsdatei anzufassen, muss man genau diesen Knoten mit `false` überschreiben. Das Problem ist, dass Magento keine komplette Ordnung vorgibt für das Laden der Dateien. Das heißt, dass die XML-Dateien in folgender Reihenfolge geladen werden:
 
-- Mage_All
-- Mage_*
-- *
+1. Mage_All.xml
+2. Mage_ * .xml
+3.  * .xml
 
 Die Konsequenz daraus ist, dass man mit jedem Third-Party-Modul alle Core-Module deaktivieren kann, da diese nach den Core-Modulen geladen werden. Leider lässt sich das nicht 1:1 auf die anderen Third-Party-Module übertragen. Allerdings geben die meisten Dateisystem die Dateien nach dem Alphabet geordnet zurück (A-Za-z), d.h. eine Datei mit dem Namen `zzz_DeactivateModules.xml` und dem folgenden Inhalt, deaktiviert unser Modul wieder.
 
@@ -90,6 +91,7 @@ Das Laden aller Konfigurationsdateien findet man in `Mage_Core_Model_Config::_ge
 Jedes Modul besitzt eine `config.xml`. Diese befindet sich im `etc` Verzeichnis des Moduls.
 
 Die XML-Datei hat verschiedene große Untergruppen:
+
 - modules
 - global
 - frontend
@@ -99,6 +101,7 @@ Die XML-Datei hat verschiedene große Untergruppen:
 - default
 - stores
 - websites
+
 #### modules 
 In `modules` gibt es einen Knoten mit dem Namen des Moduls. Es empfiehlt ich hier den gleichen Namen zu verwenden, wie der Dateiname und der Modulname in der `Namespace_ModuleName.xml`
 
