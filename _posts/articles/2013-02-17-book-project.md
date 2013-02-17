@@ -37,7 +37,13 @@ Der Name des Moduls. Meiner Meinung nach, braucht man den Namen dieses XML-Knote
 #### active
 Dieser Knoten bestimmt, ob das Modul aktiv ist oder nicht.
 ##### Tipp
-Wenn man ein Modul deaktivieren möchte, ohne die Konfigurationsdatei anzufassen, muss man genau diesen Knoten mit `false` überschreiben. Das Problem ist, dass Magento keine Ordnung vorgibt für das Laden der Dateien. Glücklicherweise geben die meisten Dateisystem die Dateien nach dem Alphabet geordnet zurück, d.h. eine Datei mit dem Namen `ZZZ_DeactivateModules.xml` und dem folgenden Inhalt, deaktiviert unser Modul wieder.
+Wenn man ein Modul deaktivieren möchte, ohne die Konfigurationsdatei anzufassen, muss man genau diesen Knoten mit `false` überschreiben. Das Problem ist, dass Magento keine komplette Ordnung vorgibt für das Laden der Dateien. Das heißt, dass die XML-Dateien in folgender Reihenfolge geladen werden:
+
+- Mage_All
+- Mage_*
+- *
+
+Die Konsequenz daraus ist, dass man mit jedem Third-Party-Modul alle Core-Module deaktivieren kann, da diese nach den Core-Modulen geladen werden. Leider lässt sich das nicht 1:1 auf die anderen Third-Party-Module übertragen. Allerdings geben die meisten Dateisystem die Dateien nach dem Alphabet geordnet zurück (A-Za-z), d.h. eine Datei mit dem Namen `zzz_DeactivateModules.xml` und dem folgenden Inhalt, deaktiviert unser Modul wieder.
 
     <?xml version="1.0"?>
     <config>
@@ -84,7 +90,6 @@ Das Laden aller Konfigurationsdateien findet man in `Mage_Core_Model_Config::_ge
 Jedes Modul besitzt eine `config.xml`. Diese befindet sich im `etc` Verzeichnis des Moduls.
 
 Die XML-Datei hat verschiedene große Untergruppen:
-
 - modules
 - global
 - frontend
@@ -94,8 +99,7 @@ Die XML-Datei hat verschiedene große Untergruppen:
 - default
 - stores
 - websites
-
-#### modules
+#### modules 
 In `modules` gibt es einen Knoten mit dem Namen des Moduls. Es empfiehlt ich hier den gleichen Namen zu verwenden, wie der Dateiname und der Modulname in der `Namespace_ModuleName.xml`
 
 In diesem Knoten wiederum wird die `version` dokumentiert. Diese ist später wichtig für Update-Skripte.
