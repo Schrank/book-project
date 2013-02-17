@@ -41,8 +41,8 @@ Dieser Knoten bestimmt, ob das Modul aktiv ist oder nicht.
 Wenn man ein Modul deaktivieren möchte, ohne die Konfigurationsdatei anzufassen, muss man genau diesen Knoten mit `false` überschreiben. Das Problem ist, dass Magento keine komplette Ordnung vorgibt für das Laden der Dateien. Das heißt, dass die XML-Dateien in folgender Reihenfolge geladen werden:
 
 1. Mage_All.xml
-2. Mage_ * .xml
-3.  * .xml
+2. Mage_\*.xml
+3. \*.xml
 
 Die Konsequenz daraus ist, dass man mit jedem Third-Party-Modul alle Core-Module deaktivieren kann, da diese nach den Core-Modulen geladen werden. Leider lässt sich das nicht 1:1 auf die anderen Third-Party-Module übertragen. Allerdings geben die meisten Dateisystem die Dateien nach dem Alphabet geordnet zurück (A-Za-z), d.h. eine Datei mit dem Namen `zzz_DeactivateModules.xml` und dem folgenden Inhalt, deaktiviert unser Modul wieder.
 
