@@ -4,10 +4,89 @@
 `Per Anhalter durch die Galaxis` von `Douglas Adams` ist ein tolles Buch und da ich plane, diesen Magento Guide unterwegs zu schreiben, wann immer ich Zeit habe, ist das erstmal der Arbeitstitel.
 
 ## Verzeichnisaufbau
+Wie jede moderne Webapplikation heutzutage, trennt Magento zwischen verschiedenen Arten von Dateien. Intuitiv ist es an einigen Stellen sicher nicht und ob es eine sinnvolle Trennung ist darüber lässt sich auch streiten, unabhängig davon schauen wir sie uns jetzt an.
+
+    .
+    ├── LICENSE.html
+    ├── LICENSE.txt
+    ├── LICENSE_AFL.txt
+    ├── RELEASE_NOTES.txt
+    ├── app
+    │   ├── Mage.php
+    │   ├── code
+    │   │   ├── community
+    │   │   ├── core
+    │   │   └── local
+    │   ├── design
+    │   │   ├── adminhtml
+    │   │   ├── frontend
+    │   │   └── install
+    │   ├── etc
+    │   │   ├── config.xml
+    │   │   ├── local.xml
+    │   │   ├── local.xml.additional
+    │   │   ├── local.xml.template
+    │   │   └── modules
+    │   └── locale
+    │       ├── en_US
+    ├── cron.php
+    ├── cron.sh
+    ├── downloader
+    ├── errors
+    ├── favicon.ico
+    ├── index.php
+    ├── js
+    ├── lib
+    │   ├── 3Dsecure
+    │   ├── LinLibertineFont
+    │   ├── Mage
+    │   ├── PEAR
+    │   ├── Varien
+    │   ├── Zend
+    │   ├── flex
+    │   ├── googlecheckout
+    │   └── phpseclib
+    ├── mage
+    ├── media
+    │   ├── catalog
+    │   ├── customer
+    │   ├── downloadable
+    │   ├── export
+    │   ├── import
+    │   └── xmlconnect
+    ├── shell
+    ├── skin
+    │   ├── adminhtml
+    │   ├── frontend
+    │   └── install
+    └── var
+    ├── cache
+    ├── import
+    ├── locks
+    └── log
+    
+### app
+Im Ordner ’app’ finde sich alle Dateien, die von PHP geparst oder ausgelesen werden. Dazu gehören alle PHP-Klassen, Templatedateien, Konfigurationsdateien, Übersetzungen
+#### app/etc
+Fangen wir mit der "leichten" Kost an. In ’app/etc’ liegt die Basis-Konfigurationsdatei ’config.xml’ und die persönliche Konfigurationsdatei für und: ’local.xml’. Die ’config.xml’ passen wir am Besten einfach in Ruhe, Änderungen kommen in die ’local.xml’. Daneben liegt noch eine ’local.xml.template’. In dieser Datei sind allerlei mögliche Konfigurationen und Parameter aufgeführt, die in Magento möglich sind. 
+
+**Achtung:** Magento lädt ALLE Dateien mit der Endung xml, die in diesem Ordner liegen und baut daraus eine Konfiguration. Dateien wie z.B. ’local.live.xml’ oder ’local.stage.xml’ haben schon zu komischem Verhalten geführt ;-) Nennt sie also besser ’local.xml.stage’, dann werden sie ignoriert.
+
+#### app/code
+In ’app/code’ liegen die verschiedenen Module von Magento, mehr zu deren Aufbau später. Für den Anfang schauen wir uns nur die drei Ordner an:
+
+- core
+- community
+- local
+
+Die Benennung ist meiner Meinung nach gut verständlich und intuitiv, leider halten sich nicht alle Entwickler daran. Im Ordner ’app/code/core’ liegen alle Dateien die von Magento sind. Dieser Ordner ist für uns tabu. Es gibt KEINEN (lies: gar keinen) Grund irgendeine Datei zu ändern und in eine Versionsverwaltung einzuchecken oder gar auf in Livesystem zu spielen. Damit will ich sagen: Debuggen ist natürlich erlaubt. Ich bin allerdings inzwischen der Meinung das ein gut gesetzter Breakpoint für xDebug oft besser ist, als ein ’var_dump()’, ’echo’ oder ’die()’. Also kann man hier auf Änderungen verzichten. Aber es ist wuer Projekt und ihr müsst entwickeln, debuggt, wie es euch am Besten passt, funktionieren soll es am Ende :-).
+
+In ’app/code/community’ liegen Module, die von der Magento-Community stammen. Früher hieß dass, sie kamen von magento-connect, aber heute kommen sie von github, via composer aus dem eigenen git oder svn. Wenn ihr ein Modul baut, dass später der Community zur Verfügung gestellt wird, packt es hier rein. Wenn die Entscheidung später kommt, ändert den Pfad in ’community’.
+
+Und zuletzt ’app/code/local’. In dieses Verzeichnis kommen alle Exklusiventwicklungen rein.
 
 ## Konfiguration
 Wie fängt man so ein Buch am Besten an? Ich dachte einfach wie ein neues Modul, da schreibe ich auch die Konfiguration zuerst.
-
 ### Modulkonfiguration (etc/modules/Namespace_ModuleName.xml)
 Die wichtigste Konfigurationsdatei für ein Modul liegt in `app/etc/modules`, mehr dazu in den Hintergrundinfos. Sie heißt normalerweise `Firma_Modulbeschreibung.xml`, also z.B. `Sap_Importer.xml` wenn SAP ein Modul zum Import implementiert.
 
@@ -40,9 +119,9 @@ Dieser Knoten bestimmt, ob das Modul aktiv ist oder nicht.
 ##### Tipp
 Wenn man ein Modul deaktivieren möchte, ohne die Konfigurationsdatei anzufassen, muss man genau diesen Knoten mit `false` überschreiben. Das Problem ist, dass Magento keine komplette Ordnung vorgibt für das Laden der Dateien. Das heißt, dass die XML-Dateien in folgender Reihenfolge geladen werden:
 
-1. Mage_All.xml
-2. Mage_\*.xml
-3. \*.xml
+- Mage_All
+- Mage_*
+- *
 
 Die Konsequenz daraus ist, dass man mit jedem Third-Party-Modul alle Core-Module deaktivieren kann, da diese nach den Core-Modulen geladen werden. Leider lässt sich das nicht 1:1 auf die anderen Third-Party-Module übertragen. Allerdings geben die meisten Dateisystem die Dateien nach dem Alphabet geordnet zurück (A-Za-z), d.h. eine Datei mit dem Namen `zzz_DeactivateModules.xml` und dem folgenden Inhalt, deaktiviert unser Modul wieder.
 
@@ -91,7 +170,6 @@ Das Laden aller Konfigurationsdateien findet man in `Mage_Core_Model_Config::_ge
 Jedes Modul besitzt eine `config.xml`. Diese befindet sich im `etc` Verzeichnis des Moduls.
 
 Die XML-Datei hat verschiedene große Untergruppen:
-
 - modules
 - global
 - frontend
@@ -101,7 +179,6 @@ Die XML-Datei hat verschiedene große Untergruppen:
 - default
 - stores
 - websites
-
 #### modules 
 In `modules` gibt es einen Knoten mit dem Namen des Moduls. Es empfiehlt ich hier den gleichen Namen zu verwenden, wie der Dateiname und der Modulname in der `Namespace_ModuleName.xml`
 
