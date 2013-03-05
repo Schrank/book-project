@@ -3,6 +3,12 @@
 ### Vorwort
 `Per Anhalter durch die Galaxis` von `Douglas Adams` ist ein tolles Buch und da ich plane, diesen Magento Guide unterwegs zu schreiben, wann immer ich Zeit habe, ist das erstmal der Arbeitstitel.
 
+#### Wording (Überschrift ändern und an einen passenderen Ort verschieben)
+[Mit Dank an](https://twitter.com/VinaiKopp/status/307773382785642496) [Vinai Kopp](https://twitter.com/VinaiKopp/status/307773580190552064) übernehme/führe ich folgendes Wording ein:
+- /app/etc/modules ist das Modulregister.
+- In Modul/etc/config.xml ist die Modulkonfiguration.
+- Alles unter app/etc und app/etc/modules zusammen ist die Basiskonfiguration
+
 ## Verzeichnisaufbau
 Wie jede moderne Webapplikation heutzutage, trennt Magento zwischen verschiedenen Arten von Dateien. Intuitiv ist es an einigen Stellen sicher nicht und ob es eine sinnvolle Trennung ist darüber lässt sich auch streiten, unabhängig davon schauen wir sie uns jetzt an.
 
@@ -90,7 +96,7 @@ Wie fängt man so ein Buch am Besten an? Ich dachte einfach wie ein neues Modul,
 ### Modulkonfiguration (etc/modules/Namespace_ModuleName.xml)
 Die wichtigste Konfigurationsdatei für ein Modul liegt in `app/etc/modules`, mehr dazu in den Hintergrundinfos. Sie heißt normalerweise `Firma_Modulbeschreibung.xml`, also z.B. `Sap_Importer.xml` wenn SAP ein Modul zum Import implementiert.
 
-Magento lädt alle xml-Dateien in `app/etc/*`, das heißt insbesondere, dass es egal ist, wie die Datei heißt. Zum leichteren Wiederfinden und für die eigene Ordnung, ist aber dringend empfohlen, dem Muster `Namespace_ModuleName` zu folgen. 
+Magento lädt alle xml-Dateien in `app/etc/*`, das heißt insbesondere, dass es egal ist, wie die Datei heißt. Zum leichteren Wiederfinden und für die eigene Ordnung, ist aber dringend empfohlen, dem Muster `Namespace_ModuleName.xml` zu folgen. 
 
 In dieser Datei kann man ein Modul aus- uns anstellen, den Codepool und Abhängigkeiten definieren. Wichtig noch zu wissen: Nach dem Laden, werden alle Dateien zu eine großen XML-Struktur verschmolzen.
 
@@ -113,7 +119,10 @@ Diese XML-Dateien hat folgenden Aufbau:
 
 
 #### Namespace_ModuleName
-Der Name des Moduls. Meiner Meinung nach, braucht man den Namen dieses XML-Knotens nie wieder. **Wichtig** ist nur, dass der Name des Knotens eindeutig über alle Konfigurationsdateien ist. Es empfiehlt sich dennoch, den Knoten ebenso zu benennen, wie die Datei selbst.
+Der Name dieses Knoten ist der Name des Moduls. Dieser Name wird verwendet um die Dateien später in den Verzeichnissen zu finden.  Also in `app/code/(core|local|community)/Namespace/ModulName/`
+
+**Wichtig** ist nur, dass der Name des Knotens eindeutig über alle Konfigurationsdateien ist.
+**Wichtig** Achtet bei dem Namen des Knotens auf groß- und Kleinschreibung und den daraus resultierenden Ordnern. Auf einem Mac oder Windows ist (standardmäßig) `app/code/local/NameSpace/` das gleiche wie `app/code/local/Namespace/`, aber spätestens wenn man seine Extension auf das Linux vom Live-System einspielt, meckert das System und geht spontan (mit einem hässlichen 503) aus.
 #### active
 Dieser Knoten bestimmt, ob das Modul aktiv ist oder nicht.
 ##### Tipp
