@@ -18,23 +18,23 @@ Wie jede moderne Webapplikation heutzutage, trennt Magento zwischen verschiedene
     ├── LICENSE_AFL.txt
     ├── RELEASE_NOTES.txt
     ├── app
-    │   ├── Mage.php
-    │   ├── code
-    │   │   ├── community
-    │   │   ├── core
-    │   │   └── local
-    │   ├── design
-    │   │   ├── adminhtml
-    │   │   ├── frontend
-    │   │   └── install
-    │   ├── etc
-    │   │   ├── config.xml
-    │   │   ├── local.xml
-    │   │   ├── local.xml.additional
-    │   │   ├── local.xml.template
-    │   │   └── modules
-    │   └── locale
-    │       ├── en_US
+    │   ├── Mage.php
+    │   ├── code
+    │   │   ├── community
+    │   │   ├── core
+    │   │   └── local
+    │   ├── design
+    │   │   ├── adminhtml
+    │   │   ├── frontend
+    │   │   └── install
+    │   ├── etc
+    │   │   ├── config.xml
+    │   │   ├── local.xml
+    │   │   ├── local.xml.additional
+    │   │   ├── local.xml.template
+    │   │   └── modules
+    │   └── locale
+    │       ├── en_US
     ├── cron.php
     ├── cron.sh
     ├── downloader
@@ -43,28 +43,28 @@ Wie jede moderne Webapplikation heutzutage, trennt Magento zwischen verschiedene
     ├── index.php
     ├── js
     ├── lib
-    │   ├── 3Dsecure
-    │   ├── LinLibertineFont
-    │   ├── Mage
-    │   ├── PEAR
-    │   ├── Varien
-    │   ├── Zend
-    │   ├── flex
-    │   ├── googlecheckout
-    │   └── phpseclib
+    │   ├── 3Dsecure
+    │   ├── LinLibertineFont
+    │   ├── Mage
+    │   ├── PEAR
+    │   ├── Varien
+    │   ├── Zend
+    │   ├── flex
+    │   ├── googlecheckout
+    │   └── phpseclib
     ├── mage
     ├── media
-    │   ├── catalog
-    │   ├── customer
-    │   ├── downloadable
-    │   ├── export
-    │   ├── import
-    │   └── xmlconnect
+    │   ├── catalog
+    │   ├── customer
+    │   ├── downloadable
+    │   ├── export
+    │   ├── import
+    │   └── xmlconnect
     ├── shell
     ├── skin
-    │   ├── adminhtml
-    │   ├── frontend
-    │   └── install
+    │   ├── adminhtml
+    │   ├── frontend
+    │   └── install
     └── var
     ├── cache
     ├── import
@@ -202,7 +202,7 @@ Beispiel:
         </modules>
     </config>
 #### global
-Im `global`-Knoten werden alle Daten gespeichert, die magentoweit benötigt werden.
+Im `global`-Knoten werden alle Daten gespeichert, die systemweit benötigt werden.
 ##### models
 ##### blocks
 ##### helpers
@@ -220,6 +220,52 @@ Im `global`-Knoten werden alle Daten gespeichert, die magentoweit benötigt werd
 #### Layout
 #### Übersetzungen
 #### Observer
+Magento implementiert an etlichen stellen ein Event-Observer-Pattern. Damit kann man z.B. Optionen an Quote-Items ändern, Exceptions schmeißen, wenn Produkte nicht gespeichert werden dürfen oder um unter bestimmten Umständen neue Menüpunkte im Backend einzufügen.
+
+Es steht und natürlich auch frei, eigene Events zu triggern. Das macht nicht soviel Sinn bei eigenen local Modulen, aber umso mehr bei community Modulen um anderen Entwicklern Möglichkeiten zum Ändern zu geben, ohne das Modul ändern zu müssen.
+
+##### Observer in der Konfiguration
+Es gibt drei Stellen um Observer in der Konfiguration zu registrieren, im frontend, adminhtml oder global Knoten. Wie man sich evtl. denken kann, werden die Observer nur aufgerufen, wenn sie im richtigen Knoten definiert sind, also für das Backend adminhtml, für das Frontend frontend. Die Observer die in global definiert sind, werden immer ausgeführt.
+
+    <config>
+        <frontend|adminhtml|global>
+            <events>
+                <customer_login>
+                    <observers>
+                        <namespace_module>
+                            <type>singleton|model|disabled</type>
+                            <class>namespace_module/observer</class>
+                            <method>customerLogin</method>
+                        </namespace_module>
+                    </observers>
+                </customer_login>
+            </events>
+        </frontend|adminhtml|global>
+    </config>
+
+Im `events`-Knoten der verschiedenen Bereiche wird ein Knoten mit dem Namen des Events angelegt. Eine Liste mit etlichen Events findet sich z.B. auf [magento.stackexchange.com](http://magento.stackexchange.com/questions/153/where-can-i-find-a-complete-list-of-magento-events/). Das richtige Event zu finden ist eine Sache für sich und wird folgenden Unterkapitel beschrieben.
+
+Innerhalb des Knotens mit dem Event-Namen, gibt es einen Knoten `observers`. Darin wiederum findet sich dann eine Liste mit allen definierten Observern. Jeder Observer muss innerhalb des Events einen **eindeutigen Namen** haben. Es bietet sich hier, einfach den Namen des Moduls zu benutzen `namespace_module`. Üblicherweise gibt es für ein Event nicht mehr als einen Observer pro Modul, damit sind die Namen einmalig. Die "echte" Konfiguration für das Event findet sich in diesem Knoten: `type`, `class` und `method`.
+
+`type` ist die Art und Weise wie die Observer-Klasse initialisiert wird. Zur Auswahl stehen hier: `model`, `singleton` und `disabled`. Mit Model wird die Methode `Mage::getModel()` genutzt, bei Singleton `Mage::getSingleton()`. Die Konsequenz eines Singleton ist, dass weniger Objekte instanziiert werden und das Daten, die innerhalb des Objekts gespeichert werden, bei anderen Events, die der Observer abhandelt (die auch als `singleton` geladen werden), zur Verfügung stehen (da es sich um das gleiche Objekt handelt).
+
+`class`: Wie zu erkennen ist, wird innerhalb  hier der Klassenname und der Methodenname definiert. Der Klassenname kann sowohl in der gewohnten Magentoschreibweise `namespace_module/classname, als auch komplett angegeben werden. Es sollte hier die magentoschreibweise bevorzugt werden um ggf. Rewrites zu ermöglichen.
+
+`method`: Beim Methodennamen scheiden sich die Geister. Hier gibt es zwei Best-Practices. Wichtig ist, dass sie **ohne** die abschließenden Klammern `customerLogin()` angegeben werden.
+
+1. Man wählt den Methodenname wie den Eventnamen, also z.B. `customerLogin` für das Event `customer_login`
+2. oder man benennt die Methode (wie üblich) nach dem was sie tut, also z.B. checkOptionsAttached()
+
+##### Observer Implementierung
+
+In der Konfiguration werden nur Modelname und Methodenname definiert. Dieses Objekt wird dann instanziiert und die Methode darauf aufgerufen. Eine Observerklasse hat keinerlei Bedingungen, d.h. Man muss weder ein Interface implementieren, noch eine Klasse erweitern.
+
+Wer mehr dazu wissen will, findet die wichtige Methode hier:
+
+    \Mage_Core_Model_App::dispatchEvent()
+
+##### Das richtige Event finden
+
 ### system.xml
 ### adminhtml.xml
 ## Model, Resourcemodel und Collections
